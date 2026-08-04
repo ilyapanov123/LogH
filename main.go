@@ -1,6 +1,8 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type Log struct {
 	Service string
@@ -29,6 +31,15 @@ func PrintLogs(logs []Log) {
 		)
 	}
 }
+func FilterByService(logs []Log, service string) []Log {
+	serviceFilter := []Log{}
+	for _, log := range logs {
+		if log.Service == service {
+			serviceFilter = append(serviceFilter, log)
+		}
+	}
+	return serviceFilter
+}
 
 func main() {
 	logs := []Log{
@@ -55,12 +66,24 @@ func main() {
 	}
 
 	errorLogs := FilterByLevel(logs, "ERROR")
+	warningLogs := FilterByLevel(logs, "WARNING")
 
 	if len(errorLogs) == 0 {
-		fmt.Println("Логи не найдены")
-		return
+		fmt.Println("Логи ERROR не найдены")
+	} else {
+		fmt.Println("Найденные логи ERROR:")
+		PrintLogs(errorLogs)
 	}
 
-	fmt.Println("Найденные логи:")
-	PrintLogs(errorLogs)
+	if len(warningLogs) == 0 {
+		fmt.Println("Логи WARNING не найдены")
+	} else {
+		fmt.Println("Найденные логи WARNING:")
+		PrintLogs(warningLogs)
+	}
+
+	minecraftLogs := FilterByService(logs, "Minecraft")
+	fmt.Println("Найденные логи по SERVICE:")
+	PrintLogs(minecraftLogs)
+
 }
