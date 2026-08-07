@@ -41,6 +41,14 @@ func FilterByService(logs []Log, service string) []Log {
 	return serviceFilter
 }
 
+func CountLogsByService(logs []Log) map[string]int {
+	counts := make(map[string]int)
+	for _, log := range logs {
+		counts[log.Service]++
+	}
+	return counts
+}
+
 func main() {
 	logs := []Log{
 		{
@@ -67,6 +75,11 @@ func main() {
 
 	errorLogs := FilterByLevel(logs, "ERROR")
 	warningLogs := FilterByLevel(logs, "WARNING")
+
+	counters := CountLogsByService(logs)
+	for service, count := range counters {
+		fmt.Println(service, "->", count)
+	}
 
 	if len(errorLogs) == 0 {
 		fmt.Println("Логи ERROR не найдены")
