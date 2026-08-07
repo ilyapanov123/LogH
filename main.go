@@ -10,6 +10,13 @@ type Log struct {
 	Message string
 }
 
+type ServiceStats struct {
+	Total   int
+	Error   int
+	Warning int
+	Info    int
+}
+
 func FilterByLevel(logs []Log, level string) []Log {
 	var filteredLogs []Log
 
@@ -31,6 +38,16 @@ func PrintLogs(logs []Log) {
 		)
 	}
 }
+
+func PrintStats(stats map[string]ServiceStats) {
+	for service, stat := range stats {
+		fmt.Println(service)
+		fmt.Println("All:", stat.Total)
+		fmt.Println("Error:", stat.Error)
+		fmt.Println("Warning:", stat.Warning)
+		fmt.Println("Info:", stat.Info)
+	}
+}
 func FilterByService(logs []Log, service string) []Log {
 	serviceFilter := []Log{}
 	for _, log := range logs {
@@ -47,6 +64,25 @@ func CountLogsByService(logs []Log) map[string]int {
 		counts[log.Service]++
 	}
 	return counts
+}
+
+func BuildServiceStats(logs []Log) map[string]ServiceStats {
+	stats := make(map[string]ServiceStats)
+	for _, log := range logs {
+		currentStats := stats[log.Service]
+		currentStats.Total++
+		if log.Level == "ERROR" {
+			currentStats.Error++
+		} else if log.Level == "WARNING" {
+			currentStats.Warning++
+		} else if log.Level == "INFO" {
+			currentStats.Info++
+		}
+
+		stats[log.Service] = currentStats
+
+	}
+	return stats
 }
 
 func main() {
@@ -98,5 +134,8 @@ func main() {
 	minecraftLogs := FilterByService(logs, "Minecraft")
 	fmt.Println("Найденные логи по SERVICE:")
 	PrintLogs(minecraftLogs)
+
+	buildService := BuildServiceStats(logs)
+	PrintStats(buildService)
 
 }
