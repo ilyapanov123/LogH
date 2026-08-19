@@ -17,6 +17,20 @@ type ServiceStats struct {
 	Info    int
 }
 
+func (stats *ServiceStats) Update(level string) {
+	stats.Total++
+
+	if level == "ERROR" {
+		stats.Error++
+	}
+	if level == "WARNING" {
+		stats.Warning++
+	}
+	if level == "INFO" {
+		stats.Info++
+	}
+}
+
 func FilterByLevel(logs []Log, level string) []Log {
 	var filteredLogs []Log
 
@@ -70,14 +84,8 @@ func BuildServiceStats(logs []Log) map[string]ServiceStats {
 	stats := make(map[string]ServiceStats)
 	for _, log := range logs {
 		currentStats := stats[log.Service]
-		currentStats.Total++
-		if log.Level == "ERROR" {
-			currentStats.Error++
-		} else if log.Level == "WARNING" {
-			currentStats.Warning++
-		} else if log.Level == "INFO" {
-			currentStats.Info++
-		}
+
+		currentStats.Update(log.Level)
 
 		stats[log.Service] = currentStats
 
