@@ -93,6 +93,27 @@ func BuildServiceStats(logs []Log) map[string]ServiceStats {
 	return stats
 }
 
+func (stats ServiceStats) HasErrors() bool {
+	if stats.Error > 0 {
+		return true
+	} else {
+		return false
+	}
+}
+
+func (stats ServiceStats) ErrorPercent() float64 {
+	if stats.Total == 0 {
+		return 0
+	}
+	return float64(stats.Error) / float64(stats.Total) * 100
+}
+func (stats ServiceStats) IsProblematic() bool {
+	if stats.ErrorPercent() > 30 {
+		return true
+	} else {
+		return false
+	}
+}
 func main() {
 	logs := []Log{
 		{
@@ -145,5 +166,12 @@ func main() {
 
 	buildService := BuildServiceStats(logs)
 	PrintStats(buildService)
+
+	for service, stats := range buildService {
+		fmt.Println(service)
+		fmt.Println(stats.HasErrors())
+		fmt.Println(stats.IsProblematic())
+		fmt.Println(stats.ErrorPercent())
+	}
 
 }
