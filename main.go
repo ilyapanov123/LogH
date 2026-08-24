@@ -10,6 +10,12 @@ type Log struct {
 	Message string
 }
 
+const (
+	ErrorLevel   = "ERROR"
+	WarningLevel = "WARNING"
+	InfoLevel    = "INFO"
+)
+
 type ServiceStats struct {
 	Total   int
 	Error   int
@@ -20,14 +26,14 @@ type ServiceStats struct {
 func (stats *ServiceStats) Update(level string) {
 	stats.Total++
 
-	if level == "ERROR" {
+	switch level {
+	case ErrorLevel:
 		stats.Error++
-	}
-	if level == "WARNING" {
+	case WarningLevel:
 		stats.Warning++
-	}
-	if level == "INFO" {
+	case InfoLevel:
 		stats.Info++
+
 	}
 }
 
