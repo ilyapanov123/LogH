@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 )
 
@@ -120,6 +121,28 @@ func (stats ServiceStats) IsProblematic() bool {
 		return false
 	}
 }
+
+var ErrServiceNotFound = errors.New("service not found")
+
+func FindFirstByService(logs []Log, service string) (Log, error) {
+	for _, log := range logs {
+		if log.Service == service {
+			return log, nil
+		}
+	}
+	err := fmt.Errorf("%w:%s", ErrServiceNotFound, service)
+	return Log{}, err
+}
+
+func GetServiceLog(logs []Log, service string) (Log, error) {
+	log, err := FindFirstByService(logs, service)
+	if err != nil {
+		return Log{}, fmt.Errorf("cannot load config: %w", err)
+	}
+	return log, nil
+
+}
+
 func main() {
 	logs := []Log{
 		{
@@ -179,5 +202,13 @@ func main() {
 		fmt.Println(stats.IsProblematic())
 		fmt.Println(stats.ErrorPercent())
 	}
-
+	log, err := GetServiceLog(logs, "billing")
+	if err != nil {
+		if errors.Is(err, ErrServiceNotFound) {
+			fmt.Println("Сервис не найден", err)
+		} else {
+			fmt.Println("Другая ошибка:", err)
+		}
+	}
+	fmt.Println(log)
 }
